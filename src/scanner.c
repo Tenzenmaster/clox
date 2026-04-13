@@ -1,4 +1,3 @@
-#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -17,6 +16,16 @@ void initScanner(const char *source) {
   scanner.start = source;
   scanner.current = source;
   scanner.line = 1;
+}
+
+static bool isDigit(char c) {
+  return c >= '0' && c <= '9';
+}
+
+static bool isAlpha(char c) {
+  return (c >= 'A' && c <= 'Z')
+      || (c >= 'a' && c <= 'z')
+      || (c == '_');
 }
 
 static bool isAtEnd() {
@@ -91,6 +100,8 @@ static TokenType checkKeyword(int start, int length, const char* rest, TokenType
   if (scanner.current - scanner.start == start + length && memcmp(scanner.start + start, rest, length) == 0) {
     return type;
   }
+  
+  return TOKEN_IDENTIFIER;
 }
 
 static TokenType identifierType() {
@@ -129,16 +140,16 @@ static TokenType identifierType() {
 }
 
 static Token identifier() {
-  while (isalpha(peek() || isdigit(peek()) || peek() == '_')) advance();
+  while (isAlpha(peek()) || isDigit(peek())) advance();
   return makeToken(identifierType());
 }
 
 static Token number() {
-  while (isdigit(peek())) advance();
+  while (isDigit(peek())) advance();
 
-  if (peek() == '.' && isdigit(peekNext())) {
+  if (peek() == '.' && isDigit(peekNext())) {
     advance();
-    while (isdigit(peek())) advance();
+    while (isDigit(peek())) advance();
   }
   
   return makeToken(TOKEN_NUMBER);
@@ -163,8 +174,8 @@ Token scanToken() {
   if (isAtEnd()) return makeToken(TOKEN_EOF);
   
   char c = advance();
-  if (isalpha(c) || c == '_') return identifier();
-  if (isdigit(c)) return number();
+  if (isAlpha(c) || c == '_') return identifier();
+  if (isDigit(c)) return number();
 
   switch (c) {
     case '(': return makeToken(TOKEN_LEFT_PAREN);
