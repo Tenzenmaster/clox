@@ -5,7 +5,7 @@ all: $(srcs)
 	cc $(srcs) $(flags) -o ./bin/clox
 
 run: all
-	./bin/clox
+	./clox
 
 clean:
-	rm ./bin/clox
+	rm ./clox
